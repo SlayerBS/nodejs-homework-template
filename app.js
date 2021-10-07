@@ -2,7 +2,7 @@ const express = require("express");
 const logger = require("morgan");
 const cors = require("cors");
 
-const contactsRouter = require("./routes/api/contacts");
+const contactsRouter = require("./routes/api/contacts.router");
 
 const app = express();
 
@@ -19,6 +19,12 @@ app.use((req, res) => {
 });
 
 app.use((err, req, res, next) => {
+  if (err.name === "ValidationError") {
+    // временное решение,
+    return res
+      .status(400)
+      .json({ status: "error", code: 400, message: err.message });
+  }
   res.status(500).json({ status: "fail", code: 500, message: err.message });
 });
 
