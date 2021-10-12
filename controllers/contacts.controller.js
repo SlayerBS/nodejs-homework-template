@@ -2,6 +2,7 @@ const Contacts = require("../repository/contacts.repository");
 
 const getAllContacts = async (req, res, next) => {
   try {
+    console.log(req.method);
     const contacts = await Contacts.listContacts();
     res.json({ status: "success", code: 200, data: { contacts } });
   } catch (error) {
