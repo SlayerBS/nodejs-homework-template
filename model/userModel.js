@@ -3,6 +3,9 @@ const { Gender } = require("../config/constants");
 const bcrypt = require("bcryptjs");
 const SALT_FACTOR = 6;
 const userSchema = new Schema({
+  name: {
+    type: String,
+  },
   password: {
     type: String,
     required: [true, "Password is required"],

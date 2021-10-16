@@ -12,7 +12,7 @@ const registrationController = async (req, res, next) => {
     return res.status(HttpCode.CONFLICT).json({
       status: "error",
       code: HttpCode.CONFLICT,
-      message: "Email is already use",
+      message: "Email in use",
     });
   }
   try {
@@ -76,9 +76,23 @@ const currentController = async (req, res, next) => {
   throw new CustomError(404, "Not Found");
 };
 
+const updateController = async (req, res, next) => {
+  const userId = req.user._id;
+  const user = await Users.updateSubscription(userId, req.body);
+  return res.status(HttpCode.OK).json({
+    status: "success",
+    code: HttpCode.OK,
+    data: {
+      email: user.email,
+      subscription: user.subscription,
+    },
+  });
+};
+
 module.exports = {
   registrationController,
   loginController,
   logoutController,
   currentController,
+  updateController,
 };
