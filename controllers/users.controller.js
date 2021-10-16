@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const Users = require("../repository/users.repository");
 const { HttpCode } = require("../config/constants");
+const { CustomError } = require("../helpers/customError");
 require("dotenv").config();
 const SECRET_KEY = process.env.JWT_SECRET_KEY;
 
@@ -44,7 +45,7 @@ const loginController = async (req, res, next) => {
   }
   const id = user._id;
   const payload = { id };
-  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "1h" });
+  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "2h" });
   await Users.updateToken(id, token);
   return res.status(HttpCode.OK).json({
     status: "success",
@@ -61,8 +62,23 @@ const logoutController = async (req, res, next) => {
   return res.status(HttpCode.NO_CONTENT).json({ test: "test" });
 };
 
+const currentController = async (req, res, next) => {
+  const userId = req.user._id;
+  const user = await Users.findById(userId);
+  if (user) {
+    return res.status(HttpCode.OK).json({
+      status: "success",
+      code: HttpCode.OK,
+      message: "Current user data",
+      data: { user },
+    });
+  }
+  throw new CustomError(404, "Not Found");
+};
+
 module.exports = {
   registrationController,
   loginController,
   logoutController,
+  currentController,
 };

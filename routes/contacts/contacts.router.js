@@ -17,23 +17,57 @@ const {
 } = require("../../controllers/contacts.controller");
 
 const guard = require("../../helpers/guard");
+const role = require("../../helpers/role");
+const wrapError = require("../../helpers/errorHandler");
+const { Gender } = require("../../config/constants");
 
-router.get("/", guard, getAllContacts);
+router.get("/", guard, wrapError(getAllContacts));
+router.get(
+  "/test",
+  guard,
+  role(Gender.MALE),
+  wrapError((req, res, next) => {
+    res.json({
+      status: "success",
+      code: 200,
+      data: { message: "Only for man" },
+    });
+  })
+);
 
-router.get("/:contactId", guard, validateId, getContactById);
+router.get("/:contactId", guard, validateId, wrapError(getContactById));
 
-router.post("/", guard, validateContact, addContact);
+router.post("/", guard, validateContact, wrapError(addContact));
 
-router.delete("/:contactId", guard, validateId, deleteContact);
+router.delete("/:contactId", guard, validateId, wrapError(deleteContact));
 
-router.put("/:contactId", guard, validateId, validateContact, changeContact);
+router.put(
+  "/:contactId",
+  guard,
+  validateId,
+  validateContact,
+  wrapError(changeContact)
+);
 
 router.patch(
   "/:contactId/favorite/",
   guard,
   validateId,
   validateStatusContact,
-  updateContact
+  wrapError(updateContact)
+);
+
+router.get(
+  "/test",
+  guard,
+  role(Gender.MALE),
+  wrapError((req, res, next) => {
+    res.json({
+      status: "success",
+      code: 200,
+      data: { message: "Only for man" },
+    });
+  })
 );
 
 module.exports = router;
