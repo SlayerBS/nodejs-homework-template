@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { HttpCode } = require("../../config/constants");
 
 const {
   validateContact,
@@ -22,6 +23,7 @@ const wrapError = require("../../helpers/errorHandler");
 const { Gender } = require("../../config/constants");
 
 router.get("/", guard, wrapError(getAllContacts));
+
 router.get(
   "/test",
   guard,
@@ -29,7 +31,7 @@ router.get(
   wrapError((req, res, next) => {
     res.json({
       status: "success",
-      code: 200,
+      code: HttpCode.OK,
       data: { message: "Only for man" },
     });
   })
@@ -55,19 +57,6 @@ router.patch(
   validateId,
   validateStatusContact,
   wrapError(updateContact)
-);
-
-router.get(
-  "/test",
-  guard,
-  role(Gender.MALE),
-  wrapError((req, res, next) => {
-    res.json({
-      status: "success",
-      code: 200,
-      data: { message: "Only for man" },
-    });
-  })
 );
 
 module.exports = router;

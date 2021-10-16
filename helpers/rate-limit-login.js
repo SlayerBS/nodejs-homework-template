@@ -3,7 +3,7 @@ const { HttpCode } = require("../config/constants");
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 3,
+  max: 50,
   handler: (req, res, next) => {
     return res.status(HttpCode.TOO_MANY_REQUESTS).json({
       status: "error",

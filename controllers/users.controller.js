@@ -34,26 +34,39 @@ const registrationController = async (req, res, next) => {
 
 const loginController = async (req, res, next) => {
   const { email, password } = req.body;
-  const user = await Users.findByEmail(email);
-  const isValidPassword = await user.isValidPassword(password);
-  if (!user || !isValidPassword) {
-    return res.status(HttpCode.UNAUATHORIZED).json({
-      status: "error",
-      code: HttpCode.UNAUATHORIZED,
-      message: "Invalid credentials",
+  try {
+    const user = await Users.findByEmail(email);
+    console.log(user);
+    const isValidPassword = await user.isValidPassword(password);
+    console.log(isValidPassword);
+    if (!user || !isValidPassword) {
+      return res.status(HttpCode.UNAUATHORIZED).json({
+        status: "error",
+        code: HttpCode.UNAUATHORIZED,
+        message: "Invalid credentials",
+      });
+    }
+
+    const id = user._id;
+    const payload = { id };
+    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "2h" });
+    await Users.updateToken(id, token);
+    return res.status(HttpCode.OK).json({
+      status: "success",
+      code: HttpCode.OK,
+      date: {
+        token,
+        user: {
+          email: user.email,
+          subscription: user.subscription,
+          id: user.id,
+          gender: user.gender,
+        },
+      },
     });
+  } catch (e) {
+    next(e);
   }
-  const id = user._id;
-  const payload = { id };
-  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "2h" });
-  await Users.updateToken(id, token);
-  return res.status(HttpCode.OK).json({
-    status: "success",
-    code: HttpCode.OK,
-    date: {
-      token,
-    },
-  });
 };
 
 const logoutController = async (req, res, next) => {
