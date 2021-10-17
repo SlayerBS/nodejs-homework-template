@@ -34,39 +34,35 @@ const registrationController = async (req, res, next) => {
 
 const loginController = async (req, res, next) => {
   const { email, password } = req.body;
-  try {
-    const user = await Users.findByEmail(email);
-    console.log(user);
+  const user = await Users.findByEmail(email);
+  if (user) {
     const isValidPassword = await user.isValidPassword(password);
-    console.log(isValidPassword);
-    if (!user || !isValidPassword) {
-      return res.status(HttpCode.UNAUATHORIZED).json({
-        status: "error",
-        code: HttpCode.UNAUATHORIZED,
-        message: "Invalid credentials",
+    console.log("validPassword", isValidPassword);
+    if (isValidPassword) {
+      const id = user._id;
+      const payload = { id };
+      const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "2h" });
+      await Users.updateToken(id, token);
+      return res.status(HttpCode.OK).json({
+        status: "success",
+        code: HttpCode.OK,
+        date: {
+          token,
+          user: {
+            email: user.email,
+            subscription: user.subscription,
+            id: user.id,
+            gender: user.gender,
+          },
+        },
       });
     }
-
-    const id = user._id;
-    const payload = { id };
-    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "2h" });
-    await Users.updateToken(id, token);
-    return res.status(HttpCode.OK).json({
-      status: "success",
-      code: HttpCode.OK,
-      date: {
-        token,
-        user: {
-          email: user.email,
-          subscription: user.subscription,
-          id: user.id,
-          gender: user.gender,
-        },
-      },
-    });
-  } catch (e) {
-    next(e);
   }
+  return res.status(HttpCode.UNAUTHORIZED).json({
+    status: "error",
+    code: HttpCode.UNAUTHORIZED,
+    message: "Invalid credentials",
+  });
 };
 
 const logoutController = async (req, res, next) => {
