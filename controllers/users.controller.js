@@ -25,6 +25,7 @@ const registrationController = async (req, res, next) => {
         name: newUser.name,
         email: newUser.email,
         gender: newUser.gender,
+        avatar: newUser.avatar,
       },
     });
   } catch (e) {
@@ -98,10 +99,18 @@ const updateController = async (req, res, next) => {
   });
 };
 
+const uploadAvatarController = async (req, res, next) => {
+  const pic = req.file;
+  console.log(pic);
+
+  return res.status(HttpCode.OK).json({ pic });
+};
+
 module.exports = {
   registrationController,
   loginController,
   logoutController,
   currentController,
   updateController,
+  uploadAvatarController,
 };
