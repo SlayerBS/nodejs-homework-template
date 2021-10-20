@@ -1,5 +1,9 @@
 const jwt = require("jsonwebtoken");
+const fs = require("fs/promises");
+const path = require("path");
+const mkdirp = require("mkdirp");
 const Users = require("../repository/users.repository");
+const UploadService = require("../services/file-upload");
 const { HttpCode } = require("../config/constants");
 const { CustomError } = require("../helpers/customError");
 require("dotenv").config();
@@ -100,10 +104,24 @@ const updateController = async (req, res, next) => {
 };
 
 const uploadAvatarController = async (req, res, next) => {
-  const pic = req.file;
-  console.log(pic);
-
-  return res.status(HttpCode.OK).json({ pic });
+  const userId = String(req.user._id);
+  const file = req.file;
+  const AVATAR_OF_USERS = process.env.AVATAR_OF_USERS;
+  const destination = path.join(AVATAR_OF_USERS, userId);
+  await mkdirp(destination);
+  const uploadService = new UploadService(destination);
+  const avatarUrl = await uploadService.save(file, userId);
+  await Users.updateAvatar(userId, avatarUrl);
+  try {
+    await fs.unlink(file.path);
+  } catch (e) {
+    console.log(e.message);
+  }
+  return res.status(HttpCode.OK).json({
+    status: "success",
+    code: HttpCode.OK,
+    date: { avatar: avatarUrl },
+  });
 };
 
 module.exports = {

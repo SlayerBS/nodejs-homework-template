@@ -24,6 +24,11 @@ router.post("/login", loginLimit, validateLogin, loginController);
 router.post("/logout", guard, logoutController);
 router.get("/current", guard, currentController);
 router.patch("/", guard, validateSubscriptionUpdate, updateController);
-router.patch("/avatar", guard, upload.single("avatar"), uploadAvatarController);
+router.patch(
+  "/avatars",
+  guard,
+  upload.single("avatar"),
+  uploadAvatarController
+);
 
 module.exports = router;
