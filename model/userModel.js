@@ -3,48 +3,63 @@ const gravatar = require("gravatar");
 const { Gender } = require("../config/constants");
 const bcrypt = require("bcryptjs");
 const SALT_FACTOR = 6;
-const userSchema = new Schema({
-  name: {
-    type: String,
-  },
-  password: {
-    type: String,
-    required: [true, "Password is required"],
-  },
-  email: {
-    type: String,
-    required: [true, "Email is required"],
-    unique: true,
-    validate(value) {
-      const re = /\S+@+.\S+/;
-      return re.test(String(value).toLowerCase());
+const userSchema = new Schema(
+  {
+    name: {
+      type: String,
+      default: "Guest",
     },
-  },
-  subscription: {
-    type: String,
-    enum: ["starter", "pro", "business"],
-    default: "starter",
-  },
-  token: {
-    type: String,
-    default: null,
-  },
-  gender: {
-    type: String,
-    enum: {
-      values: [Gender.MALE, Gender.FEMALE, Gender.NONE],
-      message: "Gender not allowed",
+    password: {
+      type: String,
+      required: [true, "Password is required"],
     },
-    default: Gender.NONE,
-  },
-  avatar: {
-    type: String,
-    default: function () {
-      return gravatar.url(this.email, { s: "250" }, true);
+    email: {
+      type: String,
+      required: [true, "Email is required"],
+      unique: true,
+      validate(value) {
+        const re = /\S+@+.\S+/;
+        return re.test(String(value).toLowerCase());
+      },
     },
+    subscription: {
+      type: String,
+      enum: ["starter", "pro", "business"],
+      default: "starter",
+    },
+    token: {
+      type: String,
+      default: null,
+    },
+    gender: {
+      type: String,
+      enum: {
+        values: [Gender.MALE, Gender.FEMALE, Gender.NONE],
+        message: "Gender not allowed",
+      },
+      default: Gender.NONE,
+    },
+    avatar: {
+      type: String,
+      default: function () {
+        return gravatar.url(this.email, { s: "250" }, true);
+      },
+    },
+    idUserCloud: { type: String, default: null },
   },
-  idUserCloud: { type: String, default: null },
-});
+  {
+    versionKey: false,
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      transform: function (doc, ret) {
+        delete ret._id;
+        return ret;
+      },
+    },
+    toObject: { virtuals: true },
+  }
+);
 
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {

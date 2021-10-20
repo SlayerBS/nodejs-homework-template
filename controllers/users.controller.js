@@ -1,8 +1,8 @@
 const jwt = require("jsonwebtoken");
 const fs = require("fs/promises");
-const path = require("path");
+// const path = require("path");
 
-const mkdirp = require("mkdirp");
+// const mkdirp = require("mkdirp");
 const Users = require("../repository/users.repository");
 // const UploadService = require("../services/file-upload");
 const UploadService = require("../services/cloud-upload");
@@ -128,13 +128,21 @@ const updateController = async (req, res, next) => {
 
 const uploadAvatarController = async (req, res, next) => {
   const { userId, idUserCloud } = req.user;
+  console.log("req.user", req.user);
   const file = req.file;
 
   const destination = "Avatars";
   const uploadService = new UploadService(destination);
-  const { avatarUrl } = await uploadService.save(file.path, idUserCloud);
-  await Users.updateAvatar(userId, avatarUrl, idUserCloud);
-
+  const { avatarUrl, returnIdUserCloud } = await uploadService.save(
+    file.path,
+    idUserCloud
+  );
+  await Users.updateAvatar(userId, avatarUrl, returnIdUserCloud);
+  try {
+    await fs.unlink(file.path);
+  } catch (error) {
+    console.log(error.message);
+  }
   return res.status(HttpCode.OK).json({
     status: "success",
     code: HttpCode.OK,
