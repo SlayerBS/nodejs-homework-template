@@ -20,6 +20,7 @@ const registrationController = async (req, res, next) => {
     });
   }
   try {
+    // TODO send email for verify users
     const newUser = await Users.create({ name, email, password, gender });
     return res.status(HttpCode.CREATED).json({
       status: "success",
@@ -43,7 +44,7 @@ const loginController = async (req, res, next) => {
   if (user) {
     const isValidPassword = await user.isValidPassword(password);
     console.log("validPassword", isValidPassword);
-    if (isValidPassword) {
+    if (isValidPassword && user.isVerified) {
       const id = user._id;
       const payload = { id };
       const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "2h" });
@@ -123,6 +124,8 @@ const uploadAvatarController = async (req, res, next) => {
     date: { avatar: avatarUrl },
   });
 };
+const verifyUser = async (req, res, next) => {};
+const repeatEmailForVerifyUser = async (req, res, next) => {};
 
 module.exports = {
   registrationController,
@@ -131,4 +134,6 @@ module.exports = {
   currentController,
   updateController,
   uploadAvatarController,
+  verifyUser,
+  repeatEmailForVerifyUser,
 };
