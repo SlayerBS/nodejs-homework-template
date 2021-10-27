@@ -61,7 +61,7 @@ const loginController = async (req, res, next) => {
   const user = await Users.findByEmail(email);
   if (user) {
     const isValidPassword = await user.isValidPassword(password);
-    console.log("validPassword", isValidPassword);
+
     if (isValidPassword && user.isVerified) {
       const id = user._id;
       const payload = { id };
@@ -142,6 +142,7 @@ const uploadAvatarController = async (req, res, next) => {
     data: { avatar: avatarUrl },
   });
 };
+
 const verifyUser = async (req, res, next) => {
   const user = await Users.findUserByVerifyToken(req.params.token);
   if (user) {
@@ -150,16 +151,17 @@ const verifyUser = async (req, res, next) => {
       status: "success",
       code: HttpCode.OK,
       data: {
-        message: "Success",
+        message: "Verification successful",
       },
     });
   }
-  return res.status(HttpCode.BAD_REQUEST).json({
+  return res.status(HttpCode.NOT_FOUND).json({
     status: "error",
-    code: HttpCode.BAD_REQUEST,
-    message: "Invalid token",
+    code: HttpCode.NOT_FOUND,
+    message: "Invalid token. User not found",
   });
 };
+
 const repeatEmailForVerifyUser = async (req, res, next) => {
   const { email } = req.body;
   const user = await Users.findByEmail(email);

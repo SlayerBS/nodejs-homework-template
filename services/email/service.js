@@ -52,7 +52,6 @@ class EmailService {
     };
     try {
       const result = await this.sender.send(msg);
-      console.log("RESULT", result);
       return true;
     } catch (error) {
       console.log(error.message);
