@@ -1,11 +1,11 @@
-const sgmail = require("@sendgrid/mail");
+const sgMail = require("@sendgrid/mail");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
 class CreateSenderSendgrid {
   async send(msg) {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-    return await sgMail.send({ ...msg, from: "email@gmail.com" });
+    return await sgMail.send({ ...msg, from: "SlayerBS@meta.ua" });
   }
 }
 
@@ -16,12 +16,12 @@ class CreateSenderNodemailer {
       port: 465,
       secure: true,
       auth: {
-        user: "goitnodejs@meta.ua",
+        user: "SlayerBS@meta.ua",
         pass: process.env.PASSWORD,
       },
     };
     const transporter = nodemailer.createTransport(config);
-    return await transporter.sendMail({ ...msg, from: "email@gmail.com" });
+    return await transporter.sendMail({ ...msg, from: "SlayerBS@meta.ua" });
   }
 }
 

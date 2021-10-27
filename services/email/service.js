@@ -5,7 +5,7 @@ class EmailService {
     this.sender = sender;
     switch (env) {
       case "development":
-        this.link = "http://localhost:5999";
+        this.link = "https://9c46-188-130-177-214.ngrok.io";
 
         break;
       case "production":
@@ -13,12 +13,13 @@ class EmailService {
 
         break;
       default:
+        this.link = "https://9c46-188-130-177-214.ngrok.io";
         break;
     }
   }
-  createTemplateemail(name, verifyToken) {
+  createTemplateEmail(name, verifyToken) {
     const mailGenerator = new Mailgen({
-      theme: "neopolitan",
+      theme: "default",
       product: {
         name: "cats and your pets",
         link: this.link,
@@ -43,7 +44,7 @@ class EmailService {
     return mailGenerator.generate(email);
   }
   async sendVerifyEmail(email, name, verifyToken) {
-    const emailHTML = this.createTemplateemail(name, verifyToken);
+    const emailHTML = this.createTemplateEmail(name, verifyToken);
     const msg = {
       to: email,
       subject: "Verify your email",
@@ -51,7 +52,7 @@ class EmailService {
     };
     try {
       const result = await this.sender.send(msg);
-      console.log(result);
+      console.log("RESULT", result);
       return true;
     } catch (error) {
       console.log(error.message);
